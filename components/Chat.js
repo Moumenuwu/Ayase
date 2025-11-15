@@ -1,7 +1,14 @@
 // components/Chat.js
 import { useEffect, useState } from "react";
 import { db } from "../firebase";
-import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  onSnapshot,
+  serverTimestamp
+} from "firebase/firestore";
 
 export default function Chat() {
   const [messages, setMessages] = useState([]);
@@ -19,28 +26,46 @@ export default function Chat() {
 
   // إرسال رسالة جديدة
   const sendMessage = async () => {
-    if (newMessage.trim() === "") return;
+    if (!newMessage.trim()) return;
+
     await addDoc(collection(db, "messages"), {
       text: newMessage,
       createdAt: serverTimestamp(),
     });
+
     setNewMessage("");
   };
 
   return (
-    <div>
-      <div style={{ maxHeight: "300px", overflowY: "scroll", border: "1px solid black", padding: "10px" }}>
+    <div style={{ maxWidth: "500px", margin: "0 auto" }}>
+      <div
+        style={{
+          maxHeight: "300px",
+          overflowY: "scroll",
+          border: "1px solid #ccc",
+          padding: "10px",
+          marginBottom: "10px"
+        }}
+      >
         {messages.map(msg => (
-          <p key={msg.id}>{msg.text}</p>
+          <p key={msg.id} style={{ margin: "5px 0" }}>
+            {msg.text}
+          </p>
         ))}
       </div>
-      <input
-        type="text"
-        value={newMessage}
-        onChange={(e) => setNewMessage(e.target.value)}
-        placeholder="اكتب رسالة..."
-      />
-      <button onClick={sendMessage}>إرسال</button>
+
+      <div style={{ display: "flex", gap: "10px" }}>
+        <input
+          type="text"
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+          placeholder="اكتب رسالة..."
+          style={{ flex: 1, padding: "5px" }}
+        />
+        <button onClick={sendMessage} style={{ padding: "5px 10px" }}>
+          إرسال
+        </button>
+      </div>
     </div>
   );
 }
