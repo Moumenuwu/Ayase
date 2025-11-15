@@ -1,68 +1,68 @@
 // components/Chat.js
 import { useEffect, useState } from "react";
-import { db } from "../firebase";
+import { db, auth } from "../firebase";
 import {
   collection,
   addDoc,
   query,
   orderBy,
   onSnapshot,
-  serverTimestamp
+  serverTimestamp,
 } from "firebase/firestore";
 
 export default function Chat() {
-  const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState("");
+  const [msgs, setMsgs] = useState([]);
+  const [text, setText] = useState("");
 
   // الاستماع للرسائل الجديدة في الوقت الحقيقي
   useEffect(() => {
-    const q = query(collection(db, "messages"), orderBy("createdAt", "asc"));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setMessages(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    const q = query(collection(db, "messages"), orderBy("time", "asc"));
+    const unsub = onSnapshot(q, (snap) => {
+      setMsgs(snap.docs.map((doc) => doc.data()));
     });
 
-    return () => unsubscribe(); // تنظيف عند الخروج
+    return () => unsub();
   }, []);
 
-  // إرسال رسالة جديدة
-  const sendMessage = async () => {
-    if (!newMessage.trim()) return;
+  const send = async () => {
+    if (!auth.currentUser) return alert("سجّل دخول أولاً");
+    if (!text.trim()) return;
 
     await addDoc(collection(db, "messages"), {
-      text: newMessage,
-      createdAt: serverTimestamp(),
+      user: auth.currentUser.displayName,
+      text,
+      time: serverTimestamp(), // Timestamp من السيرفر
     });
 
-    setNewMessage("");
+    setText("");
   };
 
   return (
-    <div style={{ maxWidth: "500px", margin: "0 auto" }}>
+    <div style={{ maxWidth: 500, margin: "0 auto" }}>
       <div
         style={{
-          maxHeight: "300px",
+          maxHeight: 300,
           overflowY: "scroll",
           border: "1px solid #ccc",
-          padding: "10px",
-          marginBottom: "10px"
+          padding: 10,
+          marginBottom: 10,
         }}
       >
-        {messages.map(msg => (
-          <p key={msg.id} style={{ margin: "5px 0" }}>
-            {msg.text}
-          </p>
+        {msgs.map((m, i) => (
+          <div key={i}>
+            <b>{m.user}:</b> {m.text}
+          </div>
         ))}
       </div>
 
-      <div style={{ display: "flex", gap: "10px" }}>
+      <div style={{ display: "flex", gap: 10 }}>
         <input
-          type="text"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
+          style={{ flex: 1, padding: 5 }}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
           placeholder="اكتب رسالة..."
-          style={{ flex: 1, padding: "5px" }}
         />
-        <button onClick={sendMessage} style={{ padding: "5px 10px" }}>
+        <button onClick={send} style={{ padding: "5px 10px" }}>
           إرسال
         </button>
       </div>
