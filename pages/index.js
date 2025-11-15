@@ -40,3 +40,18 @@ export default function Home(){
     </div>
   );
 }
+// pages/index.js
+import Chat from "../components/Chat";
+
+export default function Home() {
+  return (
+    <div style={{ textAlign: "center", marginTop: "50px" }}>
+      <h1>مرحبا في الدردشة!</h1>
+      <p>يمكنك الآن إرسال الرسائل ومشاهدتها مباشرة لكل المستخدمين.</p>
+
+      {/* هنا يظهر صندوق الدردشة */}
+      <Chat />
+    </div>
+  );
+}
+
