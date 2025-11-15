@@ -11,7 +11,7 @@ export default function Home() {
     <div style={{ padding: 20, textAlign: "center" }}>
       <h1>مرحبا في الدردشة!</h1>
       <button onClick={login} style={{ marginBottom: 20 }}>تسجيل دخول Google</button>
-      <Chat />
+      <Chat />  {/* هنا يظهر صندوق الدردشة */}
     </div>
   );
 }
